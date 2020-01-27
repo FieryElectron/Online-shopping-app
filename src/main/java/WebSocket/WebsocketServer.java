@@ -12,6 +12,7 @@ import org.json.JSONObject;
 
 import MongoDB.MongoDB;
 import Neo4jDB.Neo4jDB;
+import RedisDB.RedisDB;
 import redis.clients.jedis.Jedis;
 
 import com.mongodb.*;
@@ -34,9 +35,9 @@ import org.bson.Document;
 import org.bson.types.Binary;
 
 public class WebsocketServer extends WebSocketServer {
-	private final MongoDB mgDB = new MongoDB("mongodb://localhost:27017");
-	private final Neo4jDB neo4jDB = new Neo4jDB("bolt://localhost:7687", "neo4j", "jmp");
-	private final Jedis jedisDB = new Jedis("localhost");
+	private final MongoDB mongoDB = new MongoDB("mongodb://www.chenyiyang.com.cn:27017");
+	private final Neo4jDB neo4jDB = new Neo4jDB("bolt://www.chenyiyang.com.cn:7687", "neo4j", "jmp");
+	private final RedisDB redisDB = new RedisDB("www.chenyiyang.com.cn");
 	
 	static public List<WebSocket> clients;
 	
@@ -65,10 +66,10 @@ public class WebsocketServer extends WebSocketServer {
 		case "signup":
 			if(para1.length() == 0 || para2.length() == 0) {
 				sendMessage(conn, "alert","Invalid username or password!","","");
-			}else if(mgDB.hasUser(para1)) {
+			}else if(mongoDB.hasUser(para1)) {
 				sendMessage(conn, "alert","User exist!","","");
 			}else {
-				mgDB.insertUser(para1, para2);
+				mongoDB.insertUser(para1, para2);
 				neo4jDB.addUser(para1);
 				sendMessage(conn, "alert","Sign up succeed!","","");
 			}
@@ -76,13 +77,13 @@ public class WebsocketServer extends WebSocketServer {
 		case "signin":
 			if(para1.length() == 0 || para2.length() == 0) {
 				sendMessage(conn, "alert","Invalid username or password!","","");
-			}else if(mgDB.matchPassword(para1, para2)) {
+			}else if(mongoDB.matchPassword(para1, para2)) {
 				sendMessage(conn, "alert","User "+para1+" signed in!","","");
 				sendMessage(conn, "signin","","","");
 				
 				sendMessage(conn, "userinfo",para1,"","");
 				
-				ArrayList<String> allitem = mgDB.getAllAvailableItems();
+				ArrayList<String> allitem = mongoDB.getAllAvailableItems();
 
 				for(int i =0;i<allitem.size();++i) {
 					String pair = allitem.get(i);
@@ -90,7 +91,7 @@ public class WebsocketServer extends WebSocketServer {
 				}
 				
 				sendMessage(conn, "cleantransaction","","","");
-				String str = mgDB.getAllTransactions(para1);
+				String str = mongoDB.getAllTransactions(para1);
 
 				sendMessage(conn, "alltransactions",str,"","");
 				
@@ -100,24 +101,24 @@ public class WebsocketServer extends WebSocketServer {
 			
 			break;
 		case "getiteminfo":
-			String info = mgDB.getItemInfo(para1);
+			String info = mongoDB.getItemInfo(para1);
 			sendMessage(conn, "getiteminfo",info,"","");
 			
-			String label = mgDB.getItemLabel(para1);
+			String label = mongoDB.getItemLabel(para1);
 			neo4jDB.increaseRateOne(para2, label);
 			
 			String preference = neo4jDB.getPreferenceByRate(para2);
 			
-			String suggestedItemId = mgDB.getRandomItemIdByLabel(preference);
-			String suggestinfo = mgDB.getItemInfo(suggestedItemId);
+			String suggestedItemId = mongoDB.getRandomItemIdByLabel(preference);
+			String suggestinfo = mongoDB.getItemInfo(suggestedItemId);
 			sendMessage(conn, "getsuggesttiteminfo",suggestedItemId+";"+suggestinfo,"","");
 			
 			
 			break;
 		case "buyitem":
-			mgDB.buyItem(para1,para2,para3);
+			mongoDB.buyItem(para1,para2,para3);
 			sendMessage(conn, "cleantransaction","","","");
-			String str = mgDB.getAllTransactions(para1);
+			String str = mongoDB.getAllTransactions(para1);
 
 			sendMessage(conn, "alltransactions",str,"","");
 

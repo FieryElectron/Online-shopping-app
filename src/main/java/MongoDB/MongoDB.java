@@ -21,7 +21,7 @@ public class MongoDB implements AutoCloseable {
 
 	public MongoDB(String uri) {
 		LogManager.getLogManager().reset();
-		mongoClient = new MongoClient(new MongoClientURI("mongodb://localhost:27017"));
+		mongoClient = new MongoClient(new MongoClientURI(uri));
 	}
 	
 	@Override

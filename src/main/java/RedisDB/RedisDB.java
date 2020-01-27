@@ -7,8 +7,8 @@ import redis.clients.jedis.Jedis;
 public class RedisDB {
 	final private Jedis jedis;
 	
-	public RedisDB(){
-		jedis = new Jedis("localhost");
+	public RedisDB(String uri){
+		jedis = new Jedis(uri);
 	}
 	
 	public void delAllKeys() {
@@ -23,7 +23,7 @@ public class RedisDB {
 	}
 
 	public static void main(String[] args) {
-		RedisDB redisDB = new RedisDB();
+		RedisDB redisDB = new RedisDB("www.chenyiyang.com.cn");
 		
 		redisDB.jedis.set("key1", "val1");
 		

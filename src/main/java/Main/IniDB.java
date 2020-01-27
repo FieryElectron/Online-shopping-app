@@ -34,7 +34,7 @@ public class IniDB {
 	final private MongoClient mongoClient;
 	
 	public IniDB() {
-		mongoClient = new MongoClient(new MongoClientURI("mongodb://localhost:27017"));
+		mongoClient = new MongoClient(new MongoClientURI("mongodb://www.chenyiyang.com.cn:27017"));
 	}
 	
 
@@ -66,27 +66,24 @@ public class IniDB {
 	public static void main(String[] args) throws IOException {
 		LogManager.getLogManager().reset();
 		
-//		IniDB IDB = new IniDB();
-//		final String basePath = "E:/SpringToolSuite-WorkSpace/WebSocket/src/main/resources/img/";
-//		
-//		IDB.InsertItem("Bike","Sports","123",basePath+"bike.png");
-//		IDB.InsertItem("Car","Sports","456",basePath+"car.png");
-//		IDB.InsertItem("Ship","Sports","789",basePath+"ship.png");
-//		
-//		IDB.InsertItem("CPU","Digital Product","147",basePath+"cpu.png");
-//		IDB.InsertItem("PC","Digital Product","258",basePath+"pc.png");
-//		IDB.InsertItem("RAM","Digital Product","369",basePath+"ram.png");
-//		
-//		IDB.InsertItem("Pencil","Office Product","321",basePath+"pencil.png");
-//		IDB.InsertItem("Ruler","Office Product","654",basePath+"ruler.png");
-//		IDB.InsertItem("Eraser","Office Product","987",basePath+"eraser.png");
+		IniDB IDB = new IniDB();
+		final String basePath = "E:/SpringToolSuite-WorkSpace/WebSocket/src/main/resources/img/";
+		
+		IDB.InsertItem("Bike","Sports","123",basePath+"bike.png");
+		IDB.InsertItem("Car","Sports","456",basePath+"car.png");
+		IDB.InsertItem("Ship","Sports","789",basePath+"ship.png");
+		
+		IDB.InsertItem("CPU","Digital Product","147",basePath+"cpu.png");
+		IDB.InsertItem("PC","Digital Product","258",basePath+"pc.png");
+		IDB.InsertItem("RAM","Digital Product","369",basePath+"ram.png");
+		
+		IDB.InsertItem("Pencil","Office Product","321",basePath+"pencil.png");
+		IDB.InsertItem("Ruler","Office Product","654",basePath+"ruler.png");
+		IDB.InsertItem("Eraser","Office Product","987",basePath+"eraser.png");
 		
 
 		
-		for(int i=0;i<10;++i) {
-			System.out.println((int)(Math.random()*100)%3);
-		}
-		
+
 		
 
     }
