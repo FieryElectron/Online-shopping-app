@@ -19,7 +19,7 @@ public class RedisDB {
 	}
 	
 	public void overWriteSessionId(String userName, String sessionId) {
-		
+		System.out.print("");
 	}
 
 	public static void main(String[] args) {
