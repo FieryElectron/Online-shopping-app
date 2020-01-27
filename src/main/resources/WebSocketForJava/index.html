@@ -1,0 +1,240 @@
+<!DOCTYPE HTML>
+<html>
+	<head>
+	<meta charset="utf-8">
+		<style type="text/css">
+			html{
+				height: 100%;
+				position: relative;
+				padding: 0;
+				/*margin: 0;*/
+
+			}
+			button{
+				margin: 5px;
+				/*background-color: #4CAF50;*/
+			}
+		</style>
+		<script src="js/jquery-1.9.1.min.js"></script>
+
+	</head>
+	<body>
+		<span style="position: absolute; background: #99ffe6;left: 0;top:0;width: 50%;height: 99%;">
+			<div style="text-align:center">Available Items</div>
+			<span id="item_container">
+
+			</span>
+		</span>
+
+		<span style="position: absolute;;left: 50%;top:0;width: 50%;height: 99%;">
+			<span style="position: absolute; background: #e5ffb3;width: 100%;height: 50%;">	
+				<span style="position: absolute; background: #ffcccc;left: 0;width: 50%;height: 100%;">
+					<div style="text-align:center">Selected Item</div>
+					<div id="cItemName" style="text-align:center">Item Name</div>
+
+					<img id="cImageId" style="height: 200px;width: 160px;">
+					<br>
+					<span>Price: </span>
+					<span id="cItemPrice">0</span><span> €</span>
+					<br>
+					<input id="cNum" type="number" value="1" min="1" max="100">
+					<button id="buyItemSelected" value = "0" onclick="buyItemSelectedBtn(this.value)">buy</button>
+				</span>
+				<span style="position: absolute; background:  #ffffb3;left: 50%;width: 50%;height: 100%;">
+					<div style="text-align:center">Suggested  Item</div>
+					<div id="sItemName" style="text-align:center">Item Name</div>
+
+					<img id="sImageId" style="height: 200px;width: 160px;">
+					<br>
+					<span>Price: </span>
+					<span id="sItemPrice">0</span><span> €</span>
+					<br>
+					<input id="sNum" type="number" value="1" min="1" max="100">
+					<button id="buyItemSuggested" value = "0" onclick="buyItemSuggestedBtn(this.value)">buy</button>
+				</span>
+
+			</span>
+
+		    <span style="position: absolute; background: #b3c6ff;top:50%;width: 100%;height: 50%;">
+		    	<span>User Name: </span>
+		    	<span id="username"></span>
+		    	<br>
+		    	<div>Transactions</div>
+		    	<span id="bought_item_container">
+
+				</span>
+		    </span>
+				
+
+
+		</span>
+
+
+		<span id="login_panel" style="position: absolute;left: 0;top: 0; height: 100%;width: 100%;background: white;text-align:center;">
+			<div>Username</div>
+			<div><input id="R_username" value="root" type="text"></div>
+			<div>Password</div>
+			<div><input id="R_password" value="root" type="password"></div>
+
+			<div><button onclick="signUpFun()">Sign up</button><button onclick="signInFun()">Sign in</button></div>
+		</span>
+
+		<script type="text/javascript">
+			var selectedItemId = 0;
+
+			// function addItemToPage(id, name){
+			// 	var item = $('<button  id="'+id+'" onclick="selectItem(this.id)">'+name+'</button>');
+			// 	$("#item_container").append(item);
+			// }
+
+			// function addItemToInventory(name){
+			// 	var item = $('<button>'+name+'</button>');
+			// 	$("#bought_item_container").append(item);
+			// }
+
+
+			function selectItem(id){
+				$("#buyItemSelected").attr("value",id);
+				sendMessage("getiteminfo",id,$("#username").html(),"","");
+			}
+
+			function buyItemSelectedBtn(id){
+				if(id == 0){
+					alert("Please select item!");
+					return;
+				}
+				// console.log(id,$("#username").html(),$("#cNum").val());
+				sendMessage("buyitem",$("#username").html(),id,$("#cNum").val(),"");
+				// addItemToInventory("Item "+id);
+			}
+
+			function buyItemSuggestedBtn(id){
+				if(id == 0){
+					alert("Please select item!");
+					return;
+				}
+				sendMessage("buyitem",$("#username").html(),id,$("#sNum").val(),"");
+				// console.log(id,$("#username").html());
+			}
+
+			function signUpFun(){
+				sendMessage("signup",$("#R_username").val(),$("#R_password").val(),"","");
+			}
+
+			function signInFun(){
+				sendMessage("signin",$("#R_username").val(),$("#R_password").val(),"","");
+			}
+
+			//-------------------------
+
+			function message(para0,para1,para2,para3){
+				this.para0 = para0;
+				this.para1 = para1;
+				this.para2 = para2;
+				this.para3 = para3;
+			}
+
+			var ws = new WebSocket("ws://localhost:1234");
+
+			ws.onopen = function(){
+				console.log("opened!");
+			};
+
+			ws.onmessage = function (evt) { 
+				var received_msg = evt.data;
+				var obj = JSON.parse(received_msg);
+
+				// console.log("recv: ",obj["para0"],obj["para1"],obj["para2"],obj["para3"]);
+
+				processMessage(obj["para0"],obj["para1"],obj["para2"],obj["para3"]);
+
+			};
+
+			ws.onclose = function(){ 
+				console.log("closed!");
+			};
+
+			function addItemTo(divid, id, name){
+				var item = $('<button id="'+id+'" onclick="selectItem(this.id)">'+name+'</button>');
+				$("#"+divid).append(item);
+			}
+
+			function addItemToTrans(name, num){
+				var item = $('<button>'+name+' x '+num+'</button>');
+				$("#bought_item_container").append(item);
+			}
+
+
+			function processMessage(para0, para1, para2, para3){
+				switch(para0){
+					case "alert":
+						alert(para1);
+					break;
+					case "signin":
+						$("#login_panel").hide();
+					break;
+					case "userinfo":
+						$("#username").html(para1);
+					break;
+					case "additem":
+						var li = para2.split(";");
+						addItemTo(para1, li[0], li[1]);
+					break;
+					case "getiteminfo":
+						var de0 = para1.indexOf(";");
+						var de1 = para1.indexOf(";",de0+1);
+
+						var name = para1.substring(0,de0);
+						var price = para1.substring(de0+1,de1);
+						var image = para1.substring(de1+1,para1.length);
+
+						$("#cItemName").html(name);
+						$("#cItemPrice").html(price);
+						$("#cImageId").attr("src",'data:image/png;base64,'+image);
+					break;
+					case "getsuggesttiteminfo":
+						var de0 = para1.indexOf(";");
+						var de1 = para1.indexOf(";",de0+1);
+						var de2 = para1.indexOf(";",de1+1);
+
+						var id = para1.substring(0,de0);
+						var name = para1.substring(de0+1,de1);
+						var price = para1.substring(de1+1,de2);
+						var image = para1.substring(de2+1,para1.length);
+
+						$("#buyItemSuggested").attr("value",id);
+
+						$("#sItemName").html(name);
+						$("#sItemPrice").html(price);
+						$("#sImageId").attr("src",'data:image/png;base64,'+image);
+					break;
+					case "cleantransaction":
+						$("#bought_item_container").html("");
+					break;
+					case "alltransactions":
+						var pairs = para1.split(";");
+						for(var i = 0;i<pairs.length;++i){
+							var trans = pairs[i];
+							var li = trans.split(",");
+
+							addItemToTrans(li[0], li[1]);
+						}
+						
+					break;
+
+				}
+			}
+
+			function sendMessage(para0, para1, para2, para3){
+				var msg = new message(para0, para1, para2, para3);
+				ws.send(JSON.stringify(msg));
+			}
+
+
+
+
+			
+			
+		</script>
+	</body>
+</html>
