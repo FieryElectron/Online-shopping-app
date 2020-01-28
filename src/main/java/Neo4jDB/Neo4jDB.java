@@ -4,7 +4,11 @@ import org.neo4j.driver.*;
 
 import static org.neo4j.driver.Values.parameters;
 
+import java.lang.reflect.Array;
+import java.util.ArrayList;
 import java.util.logging.LogManager;
+
+import com.google.common.collect.ArrayListMultimap;
 
 
 public class Neo4jDB{
@@ -86,7 +90,25 @@ public class Neo4jDB{
     		}
     	}
 		return "";
+	}
+	
+	//add
+	public void addRefPrice(String user,String item,int price){
+		Result result = session.run("MERGE (:user)-[:REFPRICE]->(:item) ");
+	}
+	
+	//get price from relations
+    public ArrayList<Integer> getRefPrice(String item){
+		Result result = session.run("MATCH ()-[r:PRICE{price:50}]->(:item{name:$item})"
+									+"return r.price",parameters("item",item));
+        ArrayList<Integer> price = new ArrayList<Integer>();
+        while(result.hasNext()){
+            price.add(result.next().get("r.price").asInt());
+        }
+        return price;    
     }
+
+
     
     public static void main(String... args){
     	LogManager.getLogManager().reset();
