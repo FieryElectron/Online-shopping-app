@@ -27,7 +27,7 @@ public class RedisDB {
 		
 		redisDB.jedis.set("key1", "val1");
 		
-		redisDB.delAllKeys();
+		// redisDB.delAllKeys();
 
 		String val = redisDB.jedis.get("key1");
 		System.out.println(val);
