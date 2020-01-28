@@ -106,8 +106,45 @@ public class Neo4jDB{
             price.add(result.next().get("r.price").asInt());
         }
         return price;    
+	}
+	
+	public void deleteAll() {
+        session.writeTransaction(tx -> tx.run("MATCH (n) DETACH DELETE n"));
+        System.out.println("CLEAR ALL!");
     }
 
+
+
+	  // Add relationships
+	  public void addRs(String nodeOne, String keyOne, String mKeyOne, String nodeTwo, String keyTwo, String mKeyTwo,
+	  String relation) {
+  try  {
+	  session.writeTransaction(tx -> tx.run(
+			  "MATCH (a:" + nodeOne + "{ " + keyOne + ": $mKeyOne  })Match(b:" + nodeTwo + "{" + keyTwo
+					  + ": $mKeyTwo}) CREATE(a)-[:" + relation + "]->(b);",
+			  parameters("mKeyOne", mKeyOne, "mKeyTwo", mKeyTwo)
+
+	  ));
+  } catch (Exception e) {
+	  System.out.println("Fail to add relationship! plz check query!");
+  }
+  System.out.println("Adding successfully!");
+}
+
+// delete relationships
+public void delRS(String nodeOne, String keyOne, String mKeyOne, String nodeTwo, String keyTwo, String mKeyTwo,
+	  String relation) {
+		  String anode,bnode;
+	  if(nodeOne != "") anode = "a:" + nodeOne + "{ " + keyOne + ": $mKeyOne  }";
+	  else anode ="";
+	  if(nodeTwo != "") bnode = "b:" + nodeTwo + "{" + keyTwo+ ": $mKeyTwo}";
+	  else bnode = "";
+	  session.writeTransaction(tx -> tx.run(
+			  "MATCH ("+ anode +")-[r:" + relation + "]->("+bnode+") delete r;",
+			  parameters("mKeyOne", mKeyOne, "mKeyTwo", mKeyTwo)
+	  ));
+  System.out.println("CLEAR ALL!");
+}
 
     
     public static void main(String... args){
