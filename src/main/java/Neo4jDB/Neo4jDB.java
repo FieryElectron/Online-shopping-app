@@ -136,8 +136,8 @@ public class Neo4jDB {
 	public void addItem(String item, String label) {
 		try {
 			session.writeTransaction(
-					tx -> tx.run("Match(b:Label {type:" + " $label})" + "CREATE (a:item { name: $item  })"
-							+ "CREATE(a)-[:BELONGS_TO]->(b);", parameters("item", item, "label", label)
+					tx -> tx.run("Match(b:Label {type:" + " $label})" + "MERGE (a:item { name: $item  })"
+							+ "MERGE(a)-[:BELONGS_TO]->(b);", parameters("item", item, "label", label)
 
 					));
 		} catch (Exception e) {
@@ -152,7 +152,7 @@ public class Neo4jDB {
 		try {
 			session.writeTransaction(tx -> tx.run(
 					"MATCH (a:" + nodeOne + "{ " + keyOne + ": $mKeyOne  })Match(b:" + nodeTwo + "{" + keyTwo
-							+ ": $mKeyTwo}) CREATE(a)-[:" + relation + "]->(b);",
+							+ ": $mKeyTwo}) MERGE(a)-[:" + relation + "]->(b);",
 					parameters("mKeyOne", mKeyOne, "mKeyTwo", mKeyTwo)
 
 			));
@@ -182,38 +182,29 @@ public class Neo4jDB {
 		LogManager.getLogManager().reset();
 		Neo4jDB neo4jDB = new Neo4jDB("bolt://localhost:7687", "neo4j", "jmp");
 		// neo4jDB.deleteAll();
-		// neo4jDB.addlabel("Sports");
-		// neo4jDB.addlabel("Office Product");
-		// neo4jDB.addlabel("Digital Product");
-		// neo4jDB.addItem("Bike", "Sports");
-		// neo4jDB.addItem("Car", "Sports");
-		// neo4jDB.addItem("Ship", "Sports");
-		// neo4jDB.addItem("CPU", "Digital Product");
-		// neo4jDB.addItem("RAM", "Digital Product");
-		// neo4jDB.addItem("Pencil", "Office Product");
-		// neo4jDB.addItem("Ruler", "Office Product");
-		// neo4jDB.addItem("Eraser", "Office Product");
-		ArrayList<Integer> newList = new ArrayList<Integer>();
-		newList.add(1);
-		newList.add(2);
-		newList.add(3);
-		newList.add(4);
-		newList.add(5);
-		newList.add(6);
-		newList.add(7);
-		newList.add(8);
+		neo4jDB.addlabel("Sports");
+		neo4jDB.addlabel("Office Product");
+		neo4jDB.addlabel("Digital Product");
+		neo4jDB.addItem("Bike", "Sports");
+		neo4jDB.addItem("Car", "Sports");
+		neo4jDB.addItem("Ship", "Sports");
+		neo4jDB.addItem("CPU", "Digital Product");
+		neo4jDB.addItem("RAM", "Digital Product");
+		neo4jDB.addItem("Pencil", "Office Product");
+		neo4jDB.addItem("Ruler", "Office Product");
+		neo4jDB.addItem("Eraser", "Office Product");
+
+
+		neo4jDB.addRefPrice("Tom", "Ship", 50000);
+		neo4jDB.addRefPrice("Bill", "Ship", 50020);
+		neo4jDB.addRefPrice("Lily", "Ship", 50100);
+		neo4jDB.addRefPrice("Smith", "Ship", 49000);
+		neo4jDB.addRefPrice("Chen", "Ship", 500);
+		neo4jDB.addRefPrice("Jerry", "Ship", 50200);
+		neo4jDB.addRefPrice("Ben", "Ship", 150000);
+		neo4jDB.addRefPrice("Monica", "Ship", 50000);
 
 		getAverageRefPrice(neo4jDB.getRefPrice("Ship"));
-		// neo4jDB.addRefPrice("Tom", "Ship", 50000);
-		// neo4jDB.addRefPrice("Bill", "Ship", 50020);
-		// neo4jDB.addRefPrice("Lily", "Ship", 50100);
-		// neo4jDB.addRefPrice("Smith", "Ship", 49000);
-		// neo4jDB.addRefPrice("Chen", "Ship", 500);
-		// neo4jDB.addRefPrice("Jerry", "Ship", 50200);
-		// neo4jDB.addRefPrice("Ben", "Ship", 150000);
-		// neo4jDB.addRefPrice("Monica", "Ship", 50000);
-
-
 
 
 
