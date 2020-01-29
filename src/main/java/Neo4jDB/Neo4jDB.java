@@ -85,47 +85,40 @@ public class Neo4jDB {
 		}
 		return "";
 	}
-    private static int sum(int arr[], int n) {
-        if(n == 1) {
-            return arr[0];
-        }else {
-            return arr[n-1] + sum(arr, --n);
-        }
-    }
-	// add
-	public void addRefPrice(String user, String item, int price) {
-		Result result = session.run("MERGE (:user)-[:REFPRICE]->(:item) ");
-	}
 
-    public int getWeightRefPrice(ArrayList<Integer> price){
-		ArrayList<Integer> newList = new ArrayList<Integer>();
-		int preSum = 0;
-		int preAverage = 0;
-		int result = 0;
-		int sum =0;
-		for(int j=0;j<price.size();j++){
-			int value = price.get(j);
-			preSum += value;
-		}
-		preAverage = preSum/price.size();
-
-		for(int a=0;a<price.size();a++){
-			if((price.get(a)>0.5*preAverage)&&(price.get(a)<1.5*preAverage))
-			System.out.println(price.get(a));
-			newList.add(price.get(a));
-		}
-		for(int i=0;i<newList.size();i++){
-			int value = newList.get(i);
+	private static int sum(ArrayList<Integer> list) {
+		int sum = 0;
+		for (int j = 0; j < list.size(); j++) {
+			int value = list.get(j);
 			sum += value;
 		}
-		result = sum/newList.size();
+		return sum;
+	}
+
+	// add
+	public void addRefPrice(String user, String item, int price) {
+		Result result = session.run("MATCH(i:item{name:$item}) MERGE (:user{name:$user})-[:REFPRICE{price:"+price+"}]->(i) ",
+				parameters("user", user, "item", item));
+
+	}
+
+	public static int getAverageRefPrice(ArrayList<Integer> price) {
+		ArrayList<Integer> newList = new ArrayList<Integer>();
+		int Threshold = 0;
+		int result = 0;
+		Threshold = sum(price) / price.size();
+		for (int a = 0; a < price.size(); a++) {
+			if ((price.get(a) > 0.5 * Threshold) && (price.get(a) < 1.5 * Threshold))
+			newList.add(price.get(a));
+		}
+		result = sum(newList) / newList.size();
 		System.out.println(result);
 		return result;
 	}
 
 	// get price from relations
 	public ArrayList<Integer> getRefPrice(String item) {
-		Result result = session.run("MATCH ()-[r:PRICE{price:50}]->(:item{name:$item})" + "return r.price",
+		Result result = session.run("MATCH ()-[r:REFPRICE]->(:item{name:$item})" + "return r.price",
 				parameters("item", item));
 		ArrayList<Integer> price = new ArrayList<Integer>();
 		while (result.hasNext()) {
@@ -142,13 +135,11 @@ public class Neo4jDB {
 	// Add item belongs to label
 	public void addItem(String item, String label) {
 		try {
-			session.writeTransaction(tx -> tx.run(
-					"Match(b:Label {type:" + " $label})"
-					+"CREATE (a:item { name: $item  })"
-					+"CREATE(a)-[:BELONGS_TO]->(b);",
-					parameters("item", item, "label", label)
+			session.writeTransaction(
+					tx -> tx.run("Match(b:Label {type:" + " $label})" + "CREATE (a:item { name: $item  })"
+							+ "CREATE(a)-[:BELONGS_TO]->(b);", parameters("item", item, "label", label)
 
-			));
+					));
 		} catch (Exception e) {
 			System.out.println("Fail to add relationship! plz check query!");
 		}
@@ -211,8 +202,19 @@ public class Neo4jDB {
 		newList.add(6);
 		newList.add(7);
 		newList.add(8);
-		
-		neo4jDB.getWeightRefPrice(newList);
+
+		getAverageRefPrice(neo4jDB.getRefPrice("Ship"));
+		// neo4jDB.addRefPrice("Tom", "Ship", 50000);
+		// neo4jDB.addRefPrice("Bill", "Ship", 50020);
+		// neo4jDB.addRefPrice("Lily", "Ship", 50100);
+		// neo4jDB.addRefPrice("Smith", "Ship", 49000);
+		// neo4jDB.addRefPrice("Chen", "Ship", 500);
+		// neo4jDB.addRefPrice("Jerry", "Ship", 50200);
+		// neo4jDB.addRefPrice("Ben", "Ship", 150000);
+		// neo4jDB.addRefPrice("Monica", "Ship", 50000);
+
+
+
 
 
 
