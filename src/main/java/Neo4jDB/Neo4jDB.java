@@ -102,6 +102,13 @@ public class Neo4jDB {
 
 	}
 
+		// add
+		public void addComment(String user, String item, String comment) {
+			Result result = session.run("MATCH(i:item{name:$item}) MERGE (:user{name:$user})-[:COMMENT{comment:$comment}]->(i) ",
+					parameters("user", user, "comment",comment,"item", item));
+	
+		}
+
 	public static int getAverageRefPrice(ArrayList<Integer> price) {
 		ArrayList<Integer> newList = new ArrayList<Integer>();
 		int Threshold = 0;
@@ -182,19 +189,23 @@ public class Neo4jDB {
 		LogManager.getLogManager().reset();
 		Neo4jDB neo4jDB = new Neo4jDB("bolt://localhost:7687", "neo4j", "jmp");
 		// neo4jDB.deleteAll();
+
+		
 		neo4jDB.addlabel("Sports");
 		neo4jDB.addlabel("Office Product");
 		neo4jDB.addlabel("Digital Product");
 		neo4jDB.addItem("Bike", "Sports");
 		neo4jDB.addItem("Car", "Sports");
 		neo4jDB.addItem("Ship", "Sports");
+
+		//add label
 		neo4jDB.addItem("CPU", "Digital Product");
 		neo4jDB.addItem("RAM", "Digital Product");
 		neo4jDB.addItem("Pencil", "Office Product");
 		neo4jDB.addItem("Ruler", "Office Product");
 		neo4jDB.addItem("Eraser", "Office Product");
 
-
+		//add price relationships
 		neo4jDB.addRefPrice("Tom", "Ship", 50000);
 		neo4jDB.addRefPrice("Bill", "Ship", 50020);
 		neo4jDB.addRefPrice("Lily", "Ship", 50100);
@@ -204,8 +215,12 @@ public class Neo4jDB {
 		neo4jDB.addRefPrice("Ben", "Ship", 150000);
 		neo4jDB.addRefPrice("Monica", "Ship", 50000);
 
+
+		//get average price from neo4j relationships
 		getAverageRefPrice(neo4jDB.getRefPrice("Ship"));
 
+		//add comment to relationships
+		neo4jDB.addComment("Tom", "Ship", "it is really good! I like it very much!");
 
 
 
