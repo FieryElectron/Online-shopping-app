@@ -187,7 +187,7 @@ public class Neo4jDB {
 
 	public static void main(String... args) {
 		LogManager.getLogManager().reset();
-		Neo4jDB neo4jDB = new Neo4jDB("bolt://localhost:7687", "neo4j", "jmp");
+		Neo4jDB neo4jDB = new Neo4jDB("bolt://47.91.94.172:7687", "neo4j", "neo4j");
 		// neo4jDB.deleteAll();
 
 		
