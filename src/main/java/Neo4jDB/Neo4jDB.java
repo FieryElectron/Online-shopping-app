@@ -207,22 +207,28 @@ public class Neo4jDB {
 //		 neo4jDB.deleteAll();
 
 		
-		neo4jDB.addlabel("Sports");
-		neo4jDB.addlabel("Office Product");
-		neo4jDB.addlabel("Digital Product");
+//		neo4jDB.addlabel("Sports");
+//		neo4jDB.addlabel("Office Product");
+//		neo4jDB.addlabel("Digital Product");
+//		
+//		neo4jDB.addItem("Bike", "Sports");
+//		neo4jDB.addItem("Car", "Sports");
+//		neo4jDB.addItem("Ship", "Sports");
+//
+//		//add label
+//		neo4jDB.addItem("PC", "Digital Product");
+//		neo4jDB.addItem("CPU", "Digital Product");
+//		neo4jDB.addItem("RAM", "Digital Product");
+//		
+//		neo4jDB.addItem("Pencil", "Office Product");
+//		neo4jDB.addItem("Ruler", "Office Product");
+//		neo4jDB.addItem("Eraser", "Office Product");
 		
-		neo4jDB.addItem("Bike", "Sports");
-		neo4jDB.addItem("Car", "Sports");
-		neo4jDB.addItem("Ship", "Sports");
-
-		//add label
-		neo4jDB.addItem("PC", "Digital Product");
-		neo4jDB.addItem("CPU", "Digital Product");
-		neo4jDB.addItem("RAM", "Digital Product");
+//		neo4jDB.addComment("root","Ship","goosd");
+		String res = neo4jDB.getComment("Ship");
+		System.out.println(res);
 		
-		neo4jDB.addItem("Pencil", "Office Product");
-		neo4jDB.addItem("Ruler", "Office Product");
-		neo4jDB.addItem("Eraser", "Office Product");
+		
 		//add user
 //		neo4jDB.addUserNode("Tom");
 //		neo4jDB.addUserNode("Bill");
