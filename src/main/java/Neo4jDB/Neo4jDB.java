@@ -97,7 +97,7 @@ public class Neo4jDB {
 
 	// add
 	public void addRefPrice(String user, String item, int price) {
-		Result result = session.run("MATCH(i:item{name:$item}) MERGE (:user{name:$user})-[:REFPRICE{price:"+price+"}]->(i) ",
+		Result result = session.run("MATCH(i:item{name:$item}) MATCH(u:user{name:$user}) MERGE (u)-[:REFPRICE{price:"+price+"}]->(i) ",
 				parameters("user", user, "item", item));
 
 	}
