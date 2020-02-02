@@ -108,6 +108,9 @@ public class Neo4jDB {
 					parameters("user", user, "comment",comment,"item", item));
 	
 		}
+	public void addUserNode(String user){
+		Result result = session.run("MERGE(:user{$user})",parameters("user",user));
+	}
 
 	public static int getAverageRefPrice(ArrayList<Integer> price) {
 		ArrayList<Integer> newList = new ArrayList<Integer>();
@@ -208,6 +211,9 @@ public class Neo4jDB {
 		neo4jDB.addItem("Pencil", "Office Product");
 		neo4jDB.addItem("Ruler", "Office Product");
 		neo4jDB.addItem("Eraser", "Office Product");
+		//add user
+		neo4jDB.addUserNode("Tom");
+		neo4jDB.addUserNode("Bill");
 
 		//add price relationships
 		neo4jDB.addRefPrice("Tom", "Ship", 50000);
