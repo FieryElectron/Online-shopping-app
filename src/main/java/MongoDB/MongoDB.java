@@ -125,6 +125,21 @@ public class MongoDB implements AutoCloseable {
 		return res;
 	}
 	
+	public String getItemNameById(String id) {
+		MongoDatabase mongoDatabase = mongoClient.getDatabase("JavaDB");
+		MongoCollection<Document> mongoCollection = mongoDatabase.getCollection("ItemCL");
+
+		BasicDBObject allQuery = new BasicDBObject();
+		allQuery.put("_id",  new ObjectId(id));
+
+		Document doc = mongoCollection.find(allQuery).first();
+		
+    	String itemname = doc.getString("name");
+
+
+		return itemname;
+	}
+	
 	public String getItemLabel(String id) {
 		MongoDatabase mongoDatabase = mongoClient.getDatabase("JavaDB");
 		MongoCollection<Document> mongoCollection = mongoDatabase.getCollection("ItemCL");

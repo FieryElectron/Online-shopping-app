@@ -58,10 +58,12 @@ public class WebsocketServer extends WebSocketServer {
 	@Override
 	public void onMessage( WebSocket conn, String message ) {
 		JSONObject obj = new JSONObject(message);
-		processMessage(conn, obj.get("para0").toString(), obj.get("para1").toString(), obj.get("para2").toString(), obj.get("para3").toString());
+		processMessage(conn, obj.get("para0").toString(), obj.get("para1").toString(), obj.get("para2").toString(), obj.get("para3").toString(), obj.get("para4").toString());
 	}
 	
-	public void processMessage(WebSocket conn, String para0, String para1, String para2, String para3) {
+	public void processMessage(WebSocket conn, String para0, String para1, String para2, String para3, String para4) {
+		
+//		System.out.println(para0+"|"+para1+"|"+para2+"|"+para3+"|"+para4);
 		switch(para0) {
 		case "signup":
 			if(para1.length() == 0 || para2.length() == 0) {
@@ -102,6 +104,10 @@ public class WebsocketServer extends WebSocketServer {
 			break;
 		case "getiteminfo":
 			String info = mongoDB.getItemInfo(para1);
+			
+			int refPrice = Neo4jDB.getAverageRefPrice(neo4jDB.getRefPrice(mongoDB.getItemNameById(para1)));
+			info = info +";"+refPrice;
+
 			sendMessage(conn, "getiteminfo",info,"","");
 			
 			String label = mongoDB.getItemLabel(para1);
@@ -111,12 +117,20 @@ public class WebsocketServer extends WebSocketServer {
 			
 			String suggestedItemId = mongoDB.getRandomItemIdByLabel(preference);
 			String suggestinfo = mongoDB.getItemInfo(suggestedItemId);
+			
+			refPrice = Neo4jDB.getAverageRefPrice(neo4jDB.getRefPrice(mongoDB.getItemNameById(suggestedItemId)));
+			suggestinfo = suggestinfo +";"+refPrice;
+			
 			sendMessage(conn, "getsuggesttiteminfo",suggestedItemId+";"+suggestinfo,"","");
 			
 			
 			break;
 		case "buyitem":
 			mongoDB.buyItem(para1,para2,para3);
+
+			neo4jDB.addRefPrice(para1,mongoDB.getItemNameById(para2), Integer.parseInt(para4));
+			
+			
 			sendMessage(conn, "cleantransaction","","","");
 			String str = mongoDB.getAllTransactions(para1);
 
