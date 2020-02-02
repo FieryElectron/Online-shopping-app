@@ -109,6 +109,14 @@ public class Neo4jDB {
 					parameters("user", user, "comment",comment,"item", item));
 	
 		}
+		public String getComment(String item){
+			Result result = session.run(
+					"MATCH(i:item{name:$item})-[c:COMMENT]->() RETURN c.comment ",
+					parameters("item", item));
+			String comment = result.next().get("c.comment").asString();
+			return comment;
+	
+		}
 	public void addUserNode(String user){
 		Result result = session.run("MERGE(:User{name:$user})",parameters("user",user));
 	}
