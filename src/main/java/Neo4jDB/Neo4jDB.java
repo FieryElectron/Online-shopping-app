@@ -97,42 +97,56 @@ public class Neo4jDB {
 
 	// add
 	public void addRefPrice(String user, String item, int price) {
-		System.out.println(user+"|"+item+"|"+price);
-		Result result = session.run("MATCH(i:item{name:$item}) MATCH(u:User{name:$user}) CREATE (u)-[:REFPRICE{price:"+price+"}]->(i) ",
+		System.out.println(user + "|" + item + "|" + price);
+		Result result = session.run(
+				"MATCH(i:item{name:$item}) MATCH(u:User{name:$user}) CREATE (u)-[:REFPRICE{price:" + price + "}]->(i) ",
 				parameters("user", user, "item", item));
 
 	}
 
-		// add
-		public void addComment(String user, String item, String comment) {
-			Result result = session.run("MATCH(i:item{name:$item}) MATCH(u:User{name:$user}) MERGE (u)-[:COMMENT{comment:$comment}]->(i) ",
-					parameters("user", user, "comment",comment,"item", item));
-	
+	// add
+	public void addComment(String user, String item, String comment) {
+		Result result = session.run(
+				"MATCH(i:item{name:$item}) MATCH(u:User{name:$user}) MATCH (i)<-[c:COMMENT]-(u) RETURN c.comment",
+				parameters("item", item, "user", user));
+		if (result.hasNext()) {
+			session.run("MATCH(i:item{name:$item})<-[c:COMMENT]-() SET c.comment=$comment",
+					parameters("item", item, "comment", comment));
+		} else {
+			session.run(
+					"MATCH(i:item{name:$item}) MATCH(u:User{name:$user}) MERGE (u)-[:COMMENT{comment:$comment}]->(i) ",
+					parameters("user", user, "comment", comment, "item", item));
 		}
-		public String getComment(String item){
-			Result result = session.run(
-					"MATCH(i:item{name:$item})-[c:COMMENT]->() RETURN c.comment ",
+	}
+
+	public String getComment(String item) {
+		String comment = "";
+		try {
+			Result result = session.run("MATCH(i:item{name:$item})<-[c:COMMENT]-() RETURN c.comment ",
 					parameters("item", item));
-			String comment = result.next().get("c.comment").asString();
-			return comment;
-	
+			comment = result.next().get("c.comment").asString();
+		} catch (Exception e) {
+			System.out.println("no comment found!");
 		}
-	public void addUserNode(String user){
-		Result result = session.run("MERGE(:User{name:$user})",parameters("user",user));
+		return comment;
+	}
+
+	public void addUserNode(String user) {
+		Result result = session.run("MERGE(:User{name:$user})", parameters("user", user));
 	}
 
 	public static int getAverageRefPrice(ArrayList<Integer> price) {
 		ArrayList<Integer> newList = new ArrayList<Integer>();
 		int Threshold = 0;
 		int result = 0;
-		
-		if(price.size() == 0) {
+
+		if (price.size() == 0) {
 			return 0;
 		}
 		Threshold = sum(price) / price.size();
 		for (int a = 0; a < price.size(); a++) {
 			if ((price.get(a) > 0.5 * Threshold) && (price.get(a) < 1.5 * Threshold))
-			newList.add(price.get(a));
+				newList.add(price.get(a));
 		}
 		result = sum(newList) / newList.size();
 		System.out.println(result);
@@ -204,47 +218,42 @@ public class Neo4jDB {
 	public static void main(String... args) {
 		LogManager.getLogManager().reset();
 		Neo4jDB neo4jDB = new Neo4jDB("bolt://47.91.94.172:7687", "neo4j", "neo4j");
-//		 neo4jDB.deleteAll();
+		// neo4jDB.deleteAll();
 
-		
-//		neo4jDB.addlabel("Sports");
-//		neo4jDB.addlabel("Office Product");
-//		neo4jDB.addlabel("Digital Product");
-//		
-//		neo4jDB.addItem("Bike", "Sports");
-//		neo4jDB.addItem("Car", "Sports");
-//		neo4jDB.addItem("Ship", "Sports");
-//
-//		//add label
-//		neo4jDB.addItem("PC", "Digital Product");
-//		neo4jDB.addItem("CPU", "Digital Product");
-//		neo4jDB.addItem("RAM", "Digital Product");
-//		
-//		neo4jDB.addItem("Pencil", "Office Product");
-//		neo4jDB.addItem("Ruler", "Office Product");
-//		neo4jDB.addItem("Eraser", "Office Product");
-		
-//		neo4jDB.addComment("root","Ship","goosd");
+		// neo4jDB.addlabel("Sports");
+		// neo4jDB.addlabel("Office Product");
+		// neo4jDB.addlabel("Digital Product");
+		//
+		// neo4jDB.addItem("Bike", "Sports");
+		// neo4jDB.addItem("Car", "Sports");
+		// neo4jDB.addItem("Ship", "Sports");
+		//
+		// //add label
+		// neo4jDB.addItem("PC", "Digital Product");
+		// neo4jDB.addItem("CPU", "Digital Product");
+		// neo4jDB.addItem("RAM", "Digital Product");
+		//
+		// neo4jDB.addItem("Pencil", "Office Product");
+		// neo4jDB.addItem("Ruler", "Office Product");
+		// neo4jDB.addItem("Eraser", "Office Product");
+
+		neo4jDB.addComment("root", "Ship", "good");
 		String res = neo4jDB.getComment("Ship");
 		System.out.println(res);
-		
-		
-		//add user
-//		neo4jDB.addUserNode("Tom");
-//		neo4jDB.addUserNode("Bill");
 
-		//add price relationships
-//		neo4jDB.addRefPrice("pp", "Ship", 50000);
-//		neo4jDB.addRefPrice("Bill", "Ship", 50020);
+		// add user
+		// neo4jDB.addUserNode("Tom");
+		// neo4jDB.addUserNode("Bill");
 
+		// add price relationships
+		// neo4jDB.addRefPrice("pp", "Ship", 50000);
+		// neo4jDB.addRefPrice("Bill", "Ship", 50020);
 
-		//get average price from neo4j relationships
-//		getAverageRefPrice(neo4jDB.getRefPrice("Ship"));
-//
-//		//add comment to relationships
-//		neo4jDB.addComment("Tom", "Ship", "it is really good! I like it very much!");
-
-
+		// get average price from neo4j relationships
+		// getAverageRefPrice(neo4jDB.getRefPrice("Ship"));
+		//
+		// //add comment to relationships
+		// neo4jDB.addComment("Tom", "Ship", "it is really good! I like it very much!");
 
 		// neo4jDB.addUser("root");
 		// neo4jDB.addUser("admin");
