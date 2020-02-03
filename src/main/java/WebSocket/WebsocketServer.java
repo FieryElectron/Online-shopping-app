@@ -58,10 +58,10 @@ public class WebsocketServer extends WebSocketServer {
 	@Override
 	public void onMessage( WebSocket conn, String message ) {
 		JSONObject obj = new JSONObject(message);
-		processMessage(conn, obj.get("para0").toString(), obj.get("para1").toString(), obj.get("para2").toString(), obj.get("para3").toString(), obj.get("para4").toString());
+		processMessage(conn, obj.get("para0").toString(), obj.get("para1").toString(), obj.get("para2").toString(), obj.get("para3").toString(), obj.get("para4").toString(), obj.get("para5").toString());
 	}
 	
-	public void processMessage(WebSocket conn, String para0, String para1, String para2, String para3, String para4) {
+	public void processMessage(WebSocket conn, String para0, String para1, String para2, String para3, String para4, String para5) {
 		
 //		System.out.println(para0+"|"+para1+"|"+para2+"|"+para3+"|"+para4);
 		switch(para0) {
@@ -105,8 +105,14 @@ public class WebsocketServer extends WebSocketServer {
 		case "getiteminfo":
 			String info = mongoDB.getItemInfo(para1);
 			
+
 			int refPrice = Neo4jDB.getAverageRefPrice(neo4jDB.getRefPrice(mongoDB.getItemNameById(para1)));
 			info = info +";"+refPrice;
+
+			
+			String comment = neo4jDB.getComment(mongoDB.getItemNameById(para1));
+//			System.out.println(comment);
+			info = info +";"+comment;
 
 			sendMessage(conn, "getiteminfo",info,"","");
 			
@@ -121,6 +127,10 @@ public class WebsocketServer extends WebSocketServer {
 			refPrice = Neo4jDB.getAverageRefPrice(neo4jDB.getRefPrice(mongoDB.getItemNameById(suggestedItemId)));
 			suggestinfo = suggestinfo +";"+refPrice;
 			
+		    comment = neo4jDB.getComment(mongoDB.getItemNameById(suggestedItemId));
+//		    System.out.println(comment);
+			suggestinfo = suggestinfo +";"+comment;
+			
 			sendMessage(conn, "getsuggesttiteminfo",suggestedItemId+";"+suggestinfo,"","");
 			
 			
@@ -129,6 +139,8 @@ public class WebsocketServer extends WebSocketServer {
 			mongoDB.buyItem(para1,para2,para3);
 
 			neo4jDB.addRefPrice(para1,mongoDB.getItemNameById(para2), Integer.parseInt(para4));
+			
+			neo4jDB.addComment(para1, mongoDB.getItemNameById(para2), para5);
 			
 			
 			sendMessage(conn, "cleantransaction","","","");
